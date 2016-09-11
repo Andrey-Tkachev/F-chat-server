@@ -1,0 +1,11 @@
+{ "name" : "F-chat-server"
+, "version" : "0.0.1"
+, "description" : "Server for F-chat"
+, "main" : "server.js"
+, "man" : "./man/README.md"
+, "url" : "https://github.com/Andrey-Tkachev/F-chat-server/issues"
+, "repository": {
+    "type": "git",
+    "url": "https://github.com/Andrey-Tkachev/F-chat-server.git"
+  }
+}
