@@ -34,6 +34,16 @@ io.sockets.on('connection', function(socket){
     // INIT
   socket.on('Init', function(nickname){
     user = createUser(nickname);
+    
+    // Debug Message sending
+    var timerId = setInterval(function () {
+      socket.emit('Message', {data: "Putin - vor!", 
+                              date: Date.now, 
+                              user_id: "server000FFF", 
+                              room_id: 'general'});
+    }, 5000);
+    
+
     log.info('Init request.');
     log.info('User created: ' + user.id);
 
@@ -50,12 +60,19 @@ io.sockets.on('connection', function(socket){
           /* TODO finding empty room */
           socket.room = defaultRoom;
           socket.join(defaultRoom);
+          room.status = 'full';
+          room.save();
         }
+        else {
 
-        socket.room = room.id;
-        socket.join(room.id);
+          // Debug room creating
+          room = new RoomModel({ status: 'wait' });
+          room.save(); 
+          socket.room = room.id;
+          socket.join(room.id);
+        }
         
-        socket.emit('RoomId', {room_id: room.id});
+        socket.emit('RoomId', {room_id: socket.room});
 
         log.info('User ' + socket.user_id + ' has joined to the room ' + room_id + '.');
       });
@@ -65,7 +82,6 @@ io.sockets.on('connection', function(socket){
   // LEAVE 
   socket.on('Leave', function(){
     socket.leave(socket.room_id);
-  
   });
 
   // GET DIALOG
@@ -75,7 +91,9 @@ io.sockets.on('connection', function(socket){
 
   // NEW MESSAGE
   socket.on('Message', function(msg){
-     
+
+    // Debug resending
+    socket.emit('Message', msg);
   }); 
 
 });
