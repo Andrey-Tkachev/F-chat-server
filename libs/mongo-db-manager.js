@@ -18,9 +18,18 @@ db.once('open', function callback () {
 var Schema = mongoose.Schema;
 
 
-
-var Room = new Schema({ 
+var User = new Schema({
+  nick : {type: String}
   //users         : [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+});
+
+User.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+var Room = new Schema({
+  status : {type: String},
+  users  : [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
 });
 
 Room.virtual('id').get(function() {
@@ -29,12 +38,15 @@ Room.virtual('id').get(function() {
 
 
 var Message = new Schema({
-    // user_id    : { ... },
+    user_id       : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     data          : { type: String, required: true },
     date          : { type: Date, default: Date.now },
-    room_ref      : Schema.Types.ObjectId
+    room_id       : { type: mongoose.Schema.Types.ObjectId, ref: 'Room' } 
 });
-  
+
+Message.virtual('id').get(function() {
+  return this._id.toHexString();
+});
 
 Message.plugin(deepPopulate, {} /* more on options below */);
 
@@ -48,7 +60,10 @@ function mongoStoreConnectionArgs() {
 
 var RoomModel          = mongoose.model('Room', Room);
 var MessageModel       = mongoose.model('Message', Message);
+var UserModel       = mongoose.model('User', User);
+
 
 module.exports.MessageModel  = MessageModel;
-module.exports.UserModel     = RoomModel;
+module.exports.UserModel     = UserModel;
+module.exports.RoomModel     = RoomModel;
 module.exports.mongoose      = db;
