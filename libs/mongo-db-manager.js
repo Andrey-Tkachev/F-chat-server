@@ -40,7 +40,7 @@ Room.virtual('id').get(function() {
 var Message = new Schema({
     user_id       : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     data          : { type: String, required: true },
-    date          : { type: Date, default: Date.now },
+    date          : { type: Date, default: Date.now() },
     room_id       : { type: mongoose.Schema.Types.ObjectId, ref: 'Room' } 
 });
 

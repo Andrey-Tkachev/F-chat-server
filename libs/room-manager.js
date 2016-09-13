@@ -26,5 +26,13 @@ function deleteRoom(room_id){
     });
 }
 
+
+function setStatus(new_status, room_id) {
+    //RoomModel.update({_id : room_id}, {$set : { status : new_status }, 
+                                //      {upsert:true}}, function(err){});
+
+}
+
 module.exports.createRooms = createRooms;
 module.exports.deleteRoom  = deleteRoom;
+module.exports.setStatus   = setStatus;
