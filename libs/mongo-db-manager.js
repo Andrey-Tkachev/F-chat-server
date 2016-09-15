@@ -58,8 +58,8 @@ function mongoStoreConnectionArgs() {
 
 
 
-var RoomModel          = mongoose.model('Room', Room);
-var MessageModel       = mongoose.model('Message', Message);
+var RoomModel       = mongoose.model('Room', Room);
+var MessageModel    = mongoose.model('Message', Message);
 var UserModel       = mongoose.model('User', User);
 
 
