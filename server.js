@@ -49,7 +49,7 @@ function sendDialog(socket, room_id){
           messages = [];
         }
         socket.emit('Dialog', messages);
-    });
+    })
 }
 
 app.get('/', function(req, res) {
@@ -67,25 +67,26 @@ app.post('/register', function(req, res) {
   UserModel.findOne ({username : req.body.username}, 
     function(err, user) {
       if (user) {
-        res.sendStatus(400);
-      } else {
-        var user = new UserModel(req.body);
-        console.log(user);
+        res.end(JSON.stringify({status: 400}));
+      } else { 
         var response;
         if (!user.username || !user.hashedPassword) {
           response = {
-            status : 5000,
-            invalid : 'Invalid login or password',
+            status  : 500,
+            message : 'Invalid login or password',
           }
         } else {
+          
+          createUser(req.body);
+
           response = {
-            status : 200,
-            succes : 'Register succesfuly',
+            status  : 200,
+            message : 'Register succesfuly',
           }
-          user.save();
+         
         }
         res.end(JSON.stringify(response));
-        return 1404;
+        return;
       }
     });
 

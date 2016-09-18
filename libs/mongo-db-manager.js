@@ -35,9 +35,11 @@ var User = new Schema({
         type: String,
         required: true
     },
+
   rooms_list: [{ 
-        type: mongoose.Schema.Types.ObjectId, ref: 'Room' 
+        type: mongoose.Schema.Types.ObjectId, ref: 'Room'   
     }],
+    
   created: {
         type: Date,
         default: Date.now

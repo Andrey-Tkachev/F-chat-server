@@ -3,7 +3,8 @@ var UserModel	= require('./mongo-db-manager').UserModel;
 
 
 function create_user(req, res) {
-	// TODO
+	var user = new UserModel(req.body);
+    user.save();
 }
 
 module.exports.create_user = create_user;
