@@ -39,7 +39,7 @@ var User = new Schema({
   rooms_list: [{ 
         type: mongoose.Schema.Types.ObjectId, ref: 'Room'   
     }],
-    
+
   created: {
         type: Date,
         default: Date.now
@@ -92,10 +92,6 @@ var ClientModel = mongoose.model('Client', Client);
 // ACCES TOKEN
 var AccessToken = new Schema({
     userId: {
-        type: String,
-        required: true
-    },
-    clientId: {
         type: String,
         required: true
     },

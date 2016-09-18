@@ -63,18 +63,21 @@ app.post('/auth', function(req, res) {
         if (!user) {
           res.end(JSON.stringify({status:400}));
         } else {
-          if (user.password != req.body.password) {
+          if (!user.checkPassword(req.body.password)) {
             res.end(JSON.stringify({status : 400}))
           } else {
             
-            var token = jwt .sign(user, app.get('superSecret'), {
-              expiresInMinutes : 1440;
+            AccessTokenModel.remove({ userId: user.username }, function (err) {
+              if (err) return done(err);
             });
+
+            var tokenValue = crypto.randomBytes(32).toString('base64');
+            var token = new AccessTokenModel({ token: tokenValue, userId: user.username });
 
             var response = {
               status : 200;
               message : 'Welcome';
-              token : token;
+              token : token.token;
             }
             res.end(JSON, stringify(response));
           }
@@ -95,7 +98,7 @@ app.post('/register', function(req, res) {
           response = {
             status  : 500,
             message : 'Invalid login or password'
-          }
+          };
         } else {
           
           createUser(req.body);
@@ -103,7 +106,7 @@ app.post('/register', function(req, res) {
           response = {
             status  : 200,
             message : 'Register succesfuly'
-          }
+          };
          
         }
         res.end(JSON.stringify(response));
