@@ -63,8 +63,22 @@ app.get('/auth', function(req, res) {
 });
 
 app.get('/register', function(req, res) {
-  
-  // TODO
+
+  UserModel.findOne ({username : req.body.username}, 
+    function(err, user) {
+      if(user) {
+        res.sendStatus(400);
+      } else {
+        var user = new UserModel(req.body);
+        console.log(user);
+        var response = {
+          status : 200,
+          succes : 'Register succesfuly',
+          redirect : '/check_valid'
+        }
+        res.end("Registered");
+      }
+    });
 
 });
 
