@@ -56,9 +56,30 @@ app.get('/', function(req, res) {
   res.send('<h1>Here`ll be Dragons!</h1>');
 });
 
-app.get('/auth', function(req, res) {
+app.post('/auth', function(req, res) {
   
-  // TODO
+    UserModel.findOne({username : req.body.username}, 
+      function(err, user) {
+        if (!user) {
+          res.end(JSON.stringify({status:400}));
+        } else {
+          if (user.password != req.body.password) {
+            res.end(JSON.stringify({status : 400}))
+          } else {
+            
+            var token = jwt .sign(user, app.get('superSecret'), {
+              expiresInMinutes : 1440;
+            });
+
+            var response = {
+              status : 200;
+              message : 'Welcome';
+              token : token;
+            }
+            res.end(JSON, stringify(response));
+          }
+        }
+    });
 
 });
 
@@ -73,7 +94,7 @@ app.post('/register', function(req, res) {
         if (!user.username || !user.hashedPassword) {
           response = {
             status  : 500,
-            message : 'Invalid login or password',
+            message : 'Invalid login or password'
           }
         } else {
           
@@ -81,7 +102,7 @@ app.post('/register', function(req, res) {
 
           response = {
             status  : 200,
-            message : 'Register succesfuly',
+            message : 'Register succesfuly'
           }
          
         }
