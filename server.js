@@ -62,21 +62,30 @@ app.get('/auth', function(req, res) {
 
 });
 
-app.get('/register', function(req, res) {
+app.post('/register', function(req, res) {
 
   UserModel.findOne ({username : req.body.username}, 
     function(err, user) {
-      if(user) {
+      if (user) {
         res.sendStatus(400);
       } else {
         var user = new UserModel(req.body);
         console.log(user);
-        var response = {
-          status : 200,
-          succes : 'Register succesfuly',
-          redirect : '/check_valid'
+        var response;
+        if (!user.username || !user.hashedPassword) {
+          response = {
+            status : 5000,
+            invalid : 'Invalid login or password',
+          }
+        } else {
+          response = {
+            status : 200,
+            succes : 'Register succesfuly',
+          }
+          user.save();
         }
-        res.end("Registered");
+        res.end(JSON.stringify(response));
+        return 1404;
       }
     });
 
