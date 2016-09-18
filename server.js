@@ -49,7 +49,7 @@ function sendDialog(socket, room_id){
           messages = [];
         }
         socket.emit('Dialog', messages);
-    })
+    });
 }
 
 app.get('/', function(req, res) {
@@ -91,7 +91,7 @@ app.post('/register', function(req, res) {
         res.end(JSON.stringify({status: 400}));
       } else { 
         var response;
-        if (!user.username || !user.hashedPassword) {
+        if (!req.body || !req.body.username || !req.body.password) {
           response = {
             status  : 500,
             message : 'Invalid login or password'
@@ -126,7 +126,7 @@ io.sockets.on('connection', function(socket){
   socket.join(socket.room);
 
     // INIT
-  socket.on('Init', function(token){
+  socket.on('Auth', function(token){
     log.info('Init request.');
     if (!token || !token.token){
       log.error('Trying to init without token.');
@@ -161,7 +161,7 @@ io.sockets.on('connection', function(socket){
   //  JOIN
   socket.on('JoinRoom', function(room_json){
     log.info('Join room ' + room_json);
-    if (!room_json){
+    if (!room_json || !room_json.room_id){
       return;
     }
     RoomModel.findOne({room: room_json.room_id}, function(err, room) {

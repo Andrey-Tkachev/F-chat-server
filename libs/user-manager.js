@@ -1,13 +1,9 @@
-var UserModel         = require('./mongo-db-manager').UserModel;
+var UserModel   = require('./mongo-db-manager').UserModel;
+var log 	 	= require('./log')(module)
 
-function createUser(nickname) {
-	if (!nickname){
-		nickname = 'noname';		
-	}
-
-	user = new UserModel({nick: nickname});
-	user.save();
-	return(user);
+function createUser(req, res) {
+	var user = new UserModel(req.body);
+    user.save();
 }
 
 function killUser(user_id) {
