@@ -9,7 +9,8 @@ function getLogger(module) {
                 colorize:   true,
                 level:      'debug',
                 label:      path
-            })
+            }),
+            new (winston.transports.File)({ filename: 'info.log' })
         ]
     });
 }

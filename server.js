@@ -64,7 +64,7 @@ app.post('/auth', function(req, res) {
           res.end(JSON.stringify({status:400}));
         } else {
           if (!user.checkPassword(req.body.password)) {
-            res.end(JSON.stringify({status : 400}))
+            res.end(JSON.stringify({status : 400}));
           } else {
             
             AccessTokenModel.remove({ userId: user.username }, function (err) {
@@ -75,10 +75,10 @@ app.post('/auth', function(req, res) {
             var token = new AccessTokenModel({ token: tokenValue, userId: user.username });
 
             var response = {
-              status : 200;
-              message : 'Welcome';
-              token : token.token;
-            }
+              status : 200,
+              message : 'Welcome',
+              token : token.token
+            };
             res.end(JSON, stringify(response));
           }
         }
@@ -121,7 +121,7 @@ io.sockets.on('connection', function(socket){
   
   // USER CONNECTED
   ROOM_DEFAULT = 'general';
-  log.info('New connection from ' + address.address + ':' + address.port);
+//  log.info('New connection from ' + address.address + ':' + address.port);
 
   socket.room = ROOM_DEFAULT;
   socket.auth = false;
