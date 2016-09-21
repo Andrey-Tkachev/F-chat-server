@@ -18,7 +18,7 @@ var killUser          = require('./libs/user-manager').killUser;
 var setStatus         = require('./libs/room-manager').setStatus;
 var createRooms       = require('./libs/room-manager').createRooms;
 
-
+var bodyParser        = require('body-parser');
 var xssFilters        = require('xss-filters');
 var zlib              = require('zlib');
 var app               = express();
@@ -28,6 +28,11 @@ var server = app.listen(config.get('port'), function(){
    log.info('Server listening on port ' + config.get('port'));
 });
 var io = require('socket.io').listen(server);
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
 
 function createMessage(data, user_id, room_id) {
     Message = { 
@@ -61,10 +66,10 @@ app.post('/auth', function(req, res) {
     UserModel.findOne({username : req.body.username}, 
       function(err, user) {
         if (!user) {
-          res.end(JSON.stringify({status:400}));
+          res.end(JSON.stringify({status:400, message: "User already exists"}));
         } else {
           if (!user.checkPassword(req.body.password)) {
-            res.end(JSON.stringify({status : 400}));
+            res.end(JSON.stringify({status : 401, message: "Wrong password"}));
           } else {
             
             AccessTokenModel.remove({ userId: user.username }, function (err) {
@@ -72,7 +77,10 @@ app.post('/auth', function(req, res) {
             });
 
             var tokenValue = crypto.randomBytes(32).toString('base64');
-            var token = new AccessTokenModel({ token: tokenValue, userId: user.username });
+            var token      = new AccessTokenModel({ 
+                                token: tokenValue, 
+                                userId: user.username 
+                              });
 
             var response = {
               status : 200,
@@ -87,7 +95,16 @@ app.post('/auth', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-
+  log.info("Register request.");
+  log.info("Body: " + req.body);
+  if (!req.body.username || !req.body.password) {
+    response = {
+            status  : 500,
+            message : 'Invalid login or password'
+          };
+    res.end(JSON.stringify(response));
+    return;
+  }
   UserModel.findOne ({username : req.body.username}, 
     function(err, user) {
       if (user) {
@@ -133,6 +150,7 @@ io.sockets.on('connection', function(socket){
     log.info('Init request.');
     if (!token || !token.token){
       log.error('Trying to init without token.');
+      socket.emit('UserId', { user_id: socket.user_id });
       return;
     }
 
@@ -155,6 +173,7 @@ io.sockets.on('connection', function(socket){
 
         socket.auth = true;
         socket.user_id = user.id;
+        socket.emit('UserId', { user_id: socket.user_id });
         log.info('Init success: ' + a_token.userId);
       });
     });
@@ -210,16 +229,19 @@ io.sockets.on('connection', function(socket){
     if (!msg_json && (!msg_json.data)) {
       msg_json = { data: "" };
     }
-    msg_json = createMessage(msg_json.data, socket.user_id, socket.room);
-
+    msg_res = createMessage(msg_json.data, socket.user_id, socket.room);
+    
     if(socket.room != ROOM_DEFAULT){
-      msg = new MessageModel(msg_json);
+      msg = new MessageModel(msg_res);
       msg.save();
     }
-
+    if (!msg_json.user_id) {
+      msg_res.user_id = "undefined";
+    }
+    
     // Debug resending
-    socket.to(socket.room).emit('Message', msg_json);
-    socket.emit('Message', msg_json);
+    socket.to(socket.room).emit('Message', msg_res);
+    socket.emit('Message', msg_res);
 
   });
 

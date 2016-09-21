@@ -1,8 +1,10 @@
 var UserModel   = require('./mongo-db-manager').UserModel;
 var log 	 	= require('./log')(module)
 
-function createUser(req, res) {
-	var user = new UserModel(req.body);
+function createUser(json) {
+	var user = new UserModel(json);
+    console.log(json);
+    console.log(user);
     user.save();
 }
 

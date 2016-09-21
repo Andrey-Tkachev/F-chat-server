@@ -50,7 +50,6 @@ User.virtual('password')
     .set(function(password) {
         this._plainPassword = password;
         this.salt = crypto.randomBytes(32).toString('base64');
-        //more secure - this.salt = crypto.randomBytes(128).toString('base64');
         this.hashedPassword = this.encryptPassword(password);
         })
     .get(function() { return this._plainPassword; });
@@ -63,6 +62,24 @@ User.methods.checkPassword = function(password) {
 User.virtual('id').get(function() {
   return this._id.toHexString();
 });
+
+User.method('makeSalt', function() {
+  return Math.round((new Date().valueOf() * Math.random())) + '';
+});
+
+User.method('encryptPassword', function(password) {
+  return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
+});
+
+User.pre('save', function(next) {
+  if (false) {
+    next(new Error('Invalid password'));
+  } else {
+    next();
+  }
+});
+
+
 
 var UserModel = mongoose.model('User', User);
 
