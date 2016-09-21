@@ -163,13 +163,19 @@ io.sockets.on('connection', function(socket){
 
   //  JOIN
   socket.on('JoinRoom', function(room_json){
+    if (!socket.auth){
+      return;
+    }
     log.info('Join room ' + room_json);
-    if (!room_json || !room_json.room_id){
+    if (!room_json){
+      return;
+    }
+    if (!room_json.room_id){
       return;
     }
     RoomModel.findOne({room: room_json.room_id}, function(err, room) {
       if (!room) {
-        log.error('Room ' + room.id + ' not found.');
+        log.error('Room ' + room.room_id + ' not found.');
         return;
       }
 
@@ -181,6 +187,9 @@ io.sockets.on('connection', function(socket){
 
   // LEAVE 
   socket.on('Leave', function (){
+    if (!socket.auth){
+      return;
+    }
     log.info('Leave request from ' + socket.user_id + ' on room ' + socket.room);
     socket.leave(socket.room);
   });
